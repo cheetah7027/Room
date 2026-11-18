@@ -7,9 +7,12 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { RoomLoading } from "@/components/ui/RoomLoading";
 import { Sparkle, Buildings, User } from "@phosphor-icons/react";
+import { useAuth } from "@/components/providers/AuthProvider";
+import { PERSONAS } from "@/lib/auth/rbac";
 
 export default function SignUpPage() {
   const router = useRouter();
+  const { login } = useAuth();
   const [formData, setFormData] = useState({
     orgName: "",
     orgSlug: "",
@@ -22,6 +25,10 @@ export default function SignUpPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+
+    // Register organization and log in as Organisation Owner
+    login(PERSONAS[0]);
+
     setTimeout(() => {
       setLoading(false);
       router.push("/dashboard");

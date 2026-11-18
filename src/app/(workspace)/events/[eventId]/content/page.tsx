@@ -22,14 +22,28 @@ import {
   ShareNetwork,
   CheckCircle,
 } from "@phosphor-icons/react";
+import { RoomLoading } from "@/components/ui/RoomLoading";
 
 export default function EventContentPage() {
   const params = useParams();
-  const eventId = params.eventId as string;
+  const eventId = (params?.eventId as string) || "";
 
-  const [event, setEvent] = useState<EventItem | null>(null);
-  const [contentList, setContentList] = useState<ContentSubmission[]>([]);
-  const [creators, setCreators] = useState<Creator[]>([]);
+  const [event, setEvent] = useState<EventItem | null>(() => {
+    if (eventId) return db.getEventById(eventId) || null;
+    return null;
+  });
+  const [contentList, setContentList] = useState<ContentSubmission[]>(() => {
+    if (eventId) return db.getContentSubmissions(eventId);
+    return [];
+  });
+  const [creators, setCreators] = useState<Creator[]>(() => {
+    if (eventId) {
+      const e = db.getEventById(eventId);
+      if (e) return db.getCreators(e.organisation_id);
+    }
+    return [];
+  });
+  const [loading, setLoading] = useState<boolean>(() => !event);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
 
@@ -58,6 +72,7 @@ export default function EventContentPage() {
       setContentList([...db.getContentSubmissions(eventId)]);
       setCreators([...db.getCreators(e.organisation_id)]);
     }
+    setLoading(false);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -89,7 +104,23 @@ export default function EventContentPage() {
     setTimeout(() => setToast(null), 3000);
   };
 
-  if (!event) return null;
+  if (loading) {
+    return <RoomLoading fullPage size="lg" text="Loading Social Content Deliverables..." />;
+  }
+
+  if (!event) {
+    return (
+      <div className="max-w-7xl mx-auto px-6 py-20 text-center space-y-4">
+        <h2 className="headline text-2xl text-ink">Event not found</h2>
+        <p className="text-sm text-ink/70">
+          The event ID &ldquo;{eventId}&rdquo; was not found in content deliverables.
+        </p>
+        <Link href="/events">
+          <Button variant="secondary">Back to Events</Button>
+        </Link>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-7xl mx-auto px-6 md:px-10 py-10 space-y-8">

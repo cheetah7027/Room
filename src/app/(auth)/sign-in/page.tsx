@@ -8,9 +8,12 @@ import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { RoomLoading } from "@/components/ui/RoomLoading";
 import { Sparkle, ArrowRight, ShieldCheck, Lock } from "@phosphor-icons/react";
+import { useAuth } from "@/components/providers/AuthProvider";
+import { PERSONAS, getDefaultRouteForRole } from "@/lib/auth/rbac";
 
 export default function SignInPage() {
   const router = useRouter();
+  const { login } = useAuth();
   const [email, setEmail] = useState("rahul@pulselabs.in");
   const [password, setPassword] = useState("••••••••••••");
   const [loading, setLoading] = useState(false);
@@ -18,14 +21,31 @@ export default function SignInPage() {
   const handleSignIn = (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+
+    const cleanEmail = email.trim().toLowerCase();
+    const matched = PERSONAS.find(
+      (p) => p.email.toLowerCase() === cleanEmail
+    ) || PERSONAS[0];
+
+    login(matched);
+
     setTimeout(() => {
       setLoading(false);
-      router.push("/dashboard");
+      const target = getDefaultRouteForRole(matched.role);
+      router.push(target);
     }, 400);
   };
 
   const handlePersonaSelect = (userEmail: string) => {
     setEmail(userEmail);
+    const matched = PERSONAS.find(
+      (p) => p.email.toLowerCase() === userEmail.toLowerCase()
+    );
+    if (matched) {
+      login(matched);
+      const target = getDefaultRouteForRole(matched.role);
+      router.push(target);
+    }
   };
 
   return (
@@ -72,9 +92,9 @@ export default function SignInPage() {
                 <label className="text-xs font-mono uppercase text-ink/70">
                   Password
                 </label>
-                <a href="#" className="text-xs text-primary hover:underline font-mono">
+                <Link href="/forgot-password" className="text-xs text-primary hover:underline font-mono">
                   Forgot?
-                </a>
+                </Link>
               </div>
               <input
                 type="password"
@@ -146,6 +166,13 @@ export default function SignInPage() {
                 <span>Karan Verma (Operations Staff)</span>
                 <span className="font-mono text-[10px] opacity-70">Ops / Gate</span>
               </button>
+            </div>
+
+            <div className="text-center text-xs text-ink/60 pt-3 border-t border-hairline mt-3">
+              Don&apos;t have an organisation workspace?{" "}
+              <Link href="/sign-up" className="text-primary hover:underline font-semibold">
+                Create Organisation
+              </Link>
             </div>
           </div>
         </Card>

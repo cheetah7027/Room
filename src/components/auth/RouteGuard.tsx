@@ -2,16 +2,55 @@
 
 import React from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { canAccessRoute, getDefaultRouteForRole } from "@/lib/auth/rbac";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
-import { ShieldCheck, Lock, ArrowRight, UserSwitch } from "@phosphor-icons/react";
+import { ShieldCheck, Lock, ArrowRight, SignIn } from "@phosphor-icons/react";
 
 export function RouteGuard({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const { persona } = useAuth();
+  const { persona, isAuthenticated } = useAuth();
+
+  // If unauthenticated, prompt to sign in
+  if (!isAuthenticated) {
+    return (
+      <div className="max-w-2xl mx-auto px-6 py-20 text-center">
+        <Card className="p-8 md:p-12 space-y-6 border border-hairline shadow-soft bg-canvas">
+          <div className="w-14 h-14 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center mx-auto text-primary">
+            <Lock className="w-7 h-7" />
+          </div>
+
+          <div className="space-y-2">
+            <span className="caption-mono text-primary font-bold">
+              Authentication Required
+            </span>
+            <h2 className="headline text-2xl font-bold text-ink">
+              Sign In to Access ROOM Workspace
+            </h2>
+            <p className="text-sm text-ink/70 max-w-md mx-auto">
+              This operational workspace requires an active organisation account and authenticated session.
+            </p>
+          </div>
+
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+            <Link href="/sign-in">
+              <Button variant="primary" size="lg" className="gap-2">
+                <span>Sign In to Organisation</span>
+                <ArrowRight className="w-4 h-4" />
+              </Button>
+            </Link>
+            <Link href="/sign-up">
+              <Button variant="secondary" size="lg">
+                Create Organisation
+              </Button>
+            </Link>
+          </div>
+        </Card>
+      </div>
+    );
+  }
 
   const access = canAccessRoute(persona.role, pathname);
 

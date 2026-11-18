@@ -21,15 +21,27 @@ import {
   Eye,
   Heart,
   ChatCircle,
+  Printer,
 } from "@phosphor-icons/react";
+import { RoomLoading } from "@/components/ui/RoomLoading";
 
 export default function EventAnalyticsPage() {
   const params = useParams();
-  const eventId = params.eventId as string;
+  const eventId = (params?.eventId as string) || "";
 
-  const [event, setEvent] = useState<EventItem | null>(null);
-  const [analytics, setAnalytics] = useState<any>(null);
-  const [content, setContent] = useState<any[]>([]);
+  const [event, setEvent] = useState<EventItem | null>(() => {
+    if (eventId) return db.getEventById(eventId) || null;
+    return null;
+  });
+  const [analytics, setAnalytics] = useState<any>(() => {
+    if (eventId) return db.getEventAnalytics(eventId);
+    return null;
+  });
+  const [content, setContent] = useState<any[]>(() => {
+    if (eventId) return db.getContentSubmissions(eventId);
+    return [];
+  });
+  const [loading, setLoading] = useState<boolean>(() => !event || !analytics);
   const [exportNotice, setExportNotice] = useState<string | null>(null);
 
   useEffect(() => {
@@ -39,6 +51,7 @@ export default function EventAnalyticsPage() {
       setAnalytics(db.getEventAnalytics(eventId));
       setContent(db.getContentSubmissions(eventId));
     }
+    setLoading(false);
   }, [eventId]);
 
   const handleExportReport = () => {
@@ -74,7 +87,23 @@ export default function EventAnalyticsPage() {
     setTimeout(() => setExportNotice(null), 3500);
   };
 
-  if (!event || !analytics) return null;
+  if (loading) {
+    return <RoomLoading fullPage size="lg" text="Loading Event Analytics..." />;
+  }
+
+  if (!event || !analytics) {
+    return (
+      <div className="max-w-7xl mx-auto px-6 py-20 text-center space-y-4">
+        <h2 className="headline text-2xl text-ink">Event not found</h2>
+        <p className="text-sm text-ink/70">
+          The event ID &ldquo;{eventId}&rdquo; was not found in analytics registry.
+        </p>
+        <Link href="/events">
+          <Button variant="secondary">Back to Events</Button>
+        </Link>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-7xl mx-auto px-6 md:px-10 py-10 space-y-10">

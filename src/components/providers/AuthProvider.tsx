@@ -14,6 +14,9 @@ interface AuthContextType {
   persona: Persona;
   setPersona: (p: Persona) => void;
   switchRole: (role: Role) => void;
+  isAuthenticated: boolean;
+  login: (p?: Persona) => void;
+  logout: () => void;
   can: (permission: Permission) => boolean;
   mask: (val: string | undefined | null, type: "phone" | "email" | "notes") => string;
   isOwner: boolean;
@@ -28,14 +31,23 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const STORAGE_KEY = "room_active_persona_id";
+const STORAGE_PERSONA_KEY = "room_active_persona_id";
+const STORAGE_AUTH_KEY = "room_auth_session";
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [persona, setPersonaState] = useState<Persona>(PERSONAS[0]); // Default to Rahul Mehta (Organisation Owner)
+  const [persona, setPersonaState] = useState<Persona>(PERSONAS[0]); // Default to Rahul Mehta
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(true);
 
   useEffect(() => {
     try {
-      const savedId = localStorage.getItem(STORAGE_KEY);
+      const authState = localStorage.getItem(STORAGE_AUTH_KEY);
+      if (authState === "false") {
+        setIsAuthenticated(false);
+      } else {
+        setIsAuthenticated(true);
+      }
+
+      const savedId = localStorage.getItem(STORAGE_PERSONA_KEY);
       if (savedId) {
         const found = PERSONAS.find((p) => p.id === savedId);
         if (found) {
@@ -43,14 +55,35 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
       }
     } catch {
-      // Ignore localStorage errors in SSR or restricted environments
+      // Ignore localStorage errors in SSR
     }
   }, []);
 
   const setPersona = (p: Persona) => {
     setPersonaState(p);
     try {
-      localStorage.setItem(STORAGE_KEY, p.id);
+      localStorage.setItem(STORAGE_PERSONA_KEY, p.id);
+    } catch {
+      // Ignore
+    }
+  };
+
+  const login = (targetPersona?: Persona) => {
+    const p = targetPersona || persona || PERSONAS[0];
+    setPersona(p);
+    setIsAuthenticated(true);
+    try {
+      localStorage.setItem(STORAGE_AUTH_KEY, "true");
+      localStorage.setItem(STORAGE_PERSONA_KEY, p.id);
+    } catch {
+      // Ignore
+    }
+  };
+
+  const logout = () => {
+    setIsAuthenticated(false);
+    try {
+      localStorage.setItem(STORAGE_AUTH_KEY, "false");
     } catch {
       // Ignore
     }
@@ -64,6 +97,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const can = (permission: Permission) => {
+    if (!isAuthenticated) return false;
     return checkPermission(persona.role, permission);
   };
 
@@ -71,14 +105,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return maskData(val, type, persona.role);
   };
 
-  const isOwner = persona.role === "ORGANISATION_OWNER";
-  const isAdmin = persona.role === "ORGANISATION_ADMIN" || isOwner;
-  const isEventManager = persona.role === "EVENT_MANAGER";
-  const isBrandManager = persona.role === "BRAND_MANAGER";
-  const isOperations = persona.role === "OPERATIONS_STAFF";
-  const isCreator = persona.role === "CREATOR";
-  const isGuest = persona.role === "GUEST";
-  const isPlatformAdmin = persona.role === "PLATFORM_SUPER_ADMIN";
+  const isOwner = isAuthenticated && persona.role === "ORGANISATION_OWNER";
+  const isAdmin = isAuthenticated && (persona.role === "ORGANISATION_ADMIN" || isOwner);
+  const isEventManager = isAuthenticated && persona.role === "EVENT_MANAGER";
+  const isBrandManager = isAuthenticated && persona.role === "BRAND_MANAGER";
+  const isOperations = isAuthenticated && persona.role === "OPERATIONS_STAFF";
+  const isCreator = isAuthenticated && persona.role === "CREATOR";
+  const isGuest = isAuthenticated && persona.role === "GUEST";
+  const isPlatformAdmin = isAuthenticated && persona.role === "PLATFORM_SUPER_ADMIN";
 
   return (
     <AuthContext.Provider
@@ -86,6 +120,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         persona,
         setPersona,
         switchRole,
+        isAuthenticated,
+        login,
+        logout,
         can,
         mask,
         isOwner,
@@ -104,9 +141,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 }
 
 export function useAuth() {
-  const ctx = useContext(AuthContext);
-  if (!ctx) {
+  const context = useContext(AuthContext);
+  if (!context) {
     throw new Error("useAuth must be used within an AuthProvider");
   }
-  return ctx;
+  return context;
 }

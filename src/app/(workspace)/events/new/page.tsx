@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { db } from "@/lib/db";
+import { EventStatus } from "@/types";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Select } from "@/components/ui/Select";
@@ -26,7 +27,7 @@ export default function NewEventPage() {
     visibility: "invitation_only" as const,
     cover_image:
       "https://images.unsplash.com/photo-1511578314322-379afb476865?w=1200&q=80",
-    status: "published" as const,
+    status: "published" as EventStatus,
   });
 
   const [loading, setLoading] = useState(false);
@@ -307,25 +308,123 @@ export default function NewEventPage() {
           </div>
         </Card>
 
-        <div className="flex items-center justify-end gap-3 pt-4">
+        {/* 4. Access Tiers & Guest Categories */}
+        <Card className="space-y-5">
+          <h3 className="card-title text-lg font-semibold text-ink border-b border-hairline pb-3">
+            4. Access Tiers &amp; Admitted Categories
+          </h3>
+          <p className="text-xs text-ink/70">
+            Configure permitted guest tiers for invitations, badge generation, and scanner verification.
+          </p>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            {[
+              { id: "Creator", label: "Creators & Influencers" },
+              { id: "VIP", label: "VIP Guests" },
+              { id: "VVIP", label: "VVIP & Executives" },
+              { id: "Brand Partner", label: "Brand Partners" },
+              { id: "Media", label: "Press & Media" },
+              { id: "General", label: "General Admission" },
+            ].map((tier) => (
+              <label
+                key={tier.id}
+                className="flex items-center gap-2.5 p-3 rounded-md border border-hairline bg-surface-soft/40 cursor-pointer hover:bg-surface-soft transition-colors"
+              >
+                <input
+                  type="checkbox"
+                  defaultChecked
+                  className="rounded border-hairline text-primary focus:ring-primary/30"
+                />
+                <span className="text-xs font-medium text-ink">{tier.label}</span>
+              </label>
+            ))}
+          </div>
+        </Card>
+
+        {/* 5. Operational Team Assignment */}
+        <Card className="space-y-5">
+          <h3 className="card-title text-lg font-semibold text-ink border-b border-hairline pb-3">
+            5. Operations &amp; Team Assignment
+          </h3>
+          <p className="text-xs text-ink/70">
+            Assign workspace team members responsible for execution, creator communication, and gate security.
+          </p>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="space-y-1.5">
+              <label className="text-xs font-mono uppercase text-ink/70">
+                Lead Event Producer
+              </label>
+              <Select defaultValue="arjun" containerClassName="w-full" className="w-full text-xs">
+                <option value="arjun">Arjun Roy (Lead Producer)</option>
+                <option value="rahul">Rahul Mehta (Executive Producer)</option>
+              </Select>
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-xs font-mono uppercase text-ink/70">
+                Brand Marketing Lead
+              </label>
+              <Select defaultValue="priya" containerClassName="w-full" className="w-full text-xs">
+                <option value="priya">Priya Sharma (Brand Manager)</option>
+                <option value="meera">Meera Sen (Account Director)</option>
+              </Select>
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-xs font-mono uppercase text-ink/70">
+                Gate Check-in Supervisor
+              </label>
+              <Select defaultValue="karan" containerClassName="w-full" className="w-full text-xs">
+                <option value="karan">Karan Verma (Operations Gate Lead)</option>
+                <option value="vikram">Vikram Rathore (Field Operations)</option>
+              </Select>
+            </div>
+          </div>
+        </Card>
+
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-hairline">
           <Link href="/events">
-            <Button type="button" variant="secondary">
-              Cancel
+            <Button type="button" variant="ghost" className="text-xs">
+              Cancel &amp; Return
             </Button>
           </Link>
-          <Button type="submit" variant="primary" disabled={loading} className="gap-2">
-            {loading ? (
-              <span className="inline-flex items-center gap-2">
-                <RoomLoading size="xs" />
-                <span>Creating...</span>
-              </span>
-            ) : (
-              <>
-                <Sparkle className="w-4 h-4" />
-                <span>Save & Proceed to Guestlist</span>
-              </>
-            )}
-          </Button>
+
+          <div className="flex items-center gap-3">
+            <Button
+              type="button"
+              variant="secondary"
+              disabled={loading}
+              onClick={() => {
+                setFormData({ ...formData, status: "draft" });
+                const form = document.querySelector("form");
+                if (form) form.requestSubmit();
+              }}
+              className="text-xs"
+            >
+              Save as Draft
+            </Button>
+
+            <Button
+              type="submit"
+              variant="primary"
+              disabled={loading}
+              onClick={() => setFormData({ ...formData, status: "published" })}
+              className="gap-2 text-xs"
+            >
+              {loading ? (
+                <span className="inline-flex items-center gap-2">
+                  <RoomLoading size="xs" />
+                  <span>Processing...</span>
+                </span>
+              ) : (
+                <>
+                  <Sparkle className="w-4 h-4" />
+                  <span>Publish &amp; Proceed to Guestlist</span>
+                </>
+              )}
+            </Button>
+          </div>
         </div>
       </form>
     </div>

@@ -103,9 +103,9 @@ export default function EventsPage() {
       {/* Events Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filtered.map((evt) => {
-          const egList = db.getEventGuests(evt.id);
-          const checkedIn = egList.filter((eg) => eg.status === "checked_in").length;
-          const confirmed = egList.filter((eg) => eg.status === "confirmed" || eg.status === "checked_in").length;
+          const an = db.getEventAnalytics(evt.id);
+          const checkedIn = an.actualAttendance;
+          const confirmed = an.acceptedCount;
 
           return (
             <Card

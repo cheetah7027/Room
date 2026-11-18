@@ -22,13 +22,18 @@ import {
   ArrowsClockwise,
   Sparkle,
 } from "@phosphor-icons/react";
+import { RoomLoading } from "@/components/ui/RoomLoading";
 
 export default function CheckInConsolePage() {
   const { can, mask, persona } = useAuth();
   const params = useParams();
-  const eventId = params.eventId as string;
+  const eventId = (params?.eventId as string) || "";
 
-  const [event, setEvent] = useState<EventItem | null>(null);
+  const [event, setEvent] = useState<EventItem | null>(() => {
+    if (eventId) return db.getEventById(eventId) || null;
+    return null;
+  });
+  const [loading, setLoading] = useState<boolean>(() => !event);
   const [passTokenInput, setPassTokenInput] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [scanResult, setScanResult] = useState<{
@@ -40,7 +45,10 @@ export default function CheckInConsolePage() {
     checkIn?: CheckIn;
   } | null>(null);
 
-  const [recentCheckIns, setRecentCheckIns] = useState<CheckIn[]>([]);
+  const [recentCheckIns, setRecentCheckIns] = useState<CheckIn[]>(() => {
+    if (eventId) return [...db.checkIns.filter((c) => c.event_id === eventId)].reverse();
+    return [];
+  });
   const [isCameraActive, setIsCameraActive] = useState(false);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const scanIntervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -86,6 +94,7 @@ export default function CheckInConsolePage() {
       const evCheckIns = db.checkIns.filter((c) => c.event_id === eventId);
       setRecentCheckIns([...evCheckIns].reverse());
     }
+    setLoading(false);
   };
 
   const handleVerifyPass = async (tokenToVerify?: string) => {
@@ -209,7 +218,23 @@ export default function CheckInConsolePage() {
     }
   };
 
-  if (!event) return null;
+  if (loading) {
+    return <RoomLoading fullPage size="lg" text="Initializing Gate Check-in Console..." />;
+  }
+
+  if (!event) {
+    return (
+      <div className="max-w-7xl mx-auto px-6 py-20 text-center space-y-4">
+        <h2 className="headline text-2xl text-ink">Event not found</h2>
+        <p className="text-sm text-ink/70">
+          The event ID &ldquo;{eventId}&rdquo; was not found in the operations registry.
+        </p>
+        <Link href="/events">
+          <Button variant="secondary">Back to Events</Button>
+        </Link>
+      </div>
+    );
+  }
 
   const eventGuests = db.getEventGuests(eventId);
   const totalGuests = eventGuests.length;

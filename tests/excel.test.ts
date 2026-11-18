@@ -52,7 +52,7 @@ describe("ROOM — Excel & Manual Guest Ingestion Suite", () => {
       venue_address: "Old Airport Road",
       capacity: 150,
       visibility: "invitation_only",
-      theme_config: { primary_color: "#2B3364", accent_color: "#990B47", cover_image_url: "" },
+      cover_image: "https://images.unsplash.com/photo-1511578314322-379afb476865?w=1200&q=80",
     });
 
     // 1. Manually created guest

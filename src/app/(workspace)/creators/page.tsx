@@ -51,6 +51,7 @@ export default function CreatorCrmPage() {
     engagement_rate: "4.5%",
     primary_platform: "Instagram" as const,
     notes: "High aesthetic brand alignment.",
+    provenance: "Agency Verified" as const,
   });
 
   const refreshCreators = () => {
@@ -82,6 +83,8 @@ export default function CreatorCrmPage() {
       average_sentiment: "High",
       notes: formData.notes,
       is_verified: true,
+      provenance: formData.provenance,
+      last_synced_at: new Date().toISOString(),
     });
 
     setIsAddOpen(false);
@@ -257,9 +260,27 @@ export default function CreatorCrmPage() {
                   <div className="text-xs font-mono text-primary font-medium">
                     {creator.handle}
                   </div>
-                  <div className="flex items-center gap-1 text-xs text-ink/60 mt-1">
-                    <MapPin className="w-3 h-3 text-ink/40" />
-                    <span>{creator.location}</span>
+                  <div className="flex items-center justify-between text-xs text-ink/60 mt-1">
+                    <div className="flex items-center gap-1">
+                      <MapPin className="w-3 h-3 text-ink/40" />
+                      <span>{creator.location}</span>
+                    </div>
+                    {creator.provenance && (
+                      <span
+                        className={`text-[9px] font-mono uppercase px-2 py-0.5 rounded-full font-bold inline-flex items-center gap-1 ${
+                          creator.provenance === "Agency Verified"
+                            ? "bg-semantic-success/15 text-semantic-success border border-semantic-success/30"
+                            : creator.provenance === "API Sync"
+                            ? "bg-block-navy/15 text-primary border border-primary/25"
+                            : creator.provenance === "Creator Provided"
+                            ? "bg-block-lilac/50 text-ink border border-block-lilac"
+                            : "bg-surface-soft text-ink/70 border border-hairline"
+                        }`}
+                      >
+                        <span>●</span>
+                        <span>{creator.provenance}</span>
+                      </span>
+                    )}
                   </div>
                 </div>
               </div>
@@ -448,6 +469,28 @@ export default function CreatorCrmPage() {
             />
           </div>
 
+          <div className="space-y-1">
+            <label className="text-xs font-mono uppercase text-ink/70">
+              Data Source &amp; Verification State
+            </label>
+            <Select
+              value={formData.provenance}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  provenance: e.target.value as any,
+                })
+              }
+              containerClassName="w-full"
+              className="w-full text-sm"
+            >
+              <option value="Agency Verified">Agency Verified (Audit Checked)</option>
+              <option value="API Sync">API Sync (Instagram / YouTube Graph API)</option>
+              <option value="Creator Provided">Creator Provided (Direct Media Kit)</option>
+              <option value="Manually Entered">Manually Entered (Unverified Draft)</option>
+            </Select>
+          </div>
+
           <div className="flex justify-end gap-3 pt-3">
             <Button
               type="button"
@@ -495,6 +538,28 @@ export default function CreatorCrmPage() {
             <div><strong>Creator:</strong> {selectedCreatorForInvite?.name} ({selectedCreatorForInvite?.handle})</div>
             <div><strong>Category:</strong> Creator Access Pass</div>
             <div><strong>Channel:</strong> Transactional Email + WhatsApp notification</div>
+          </div>
+
+          <div className="space-y-1">
+            <label className="text-xs font-mono uppercase text-ink/70">
+              Data Source &amp; Verification State
+            </label>
+            <Select
+              value={formData.provenance}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  provenance: e.target.value as any,
+                })
+              }
+              containerClassName="w-full"
+              className="w-full text-sm"
+            >
+              <option value="Agency Verified">Agency Verified (Audit Checked)</option>
+              <option value="API Sync">API Sync (Instagram / YouTube Graph API)</option>
+              <option value="Creator Provided">Creator Provided (Direct Media Kit)</option>
+              <option value="Manually Entered">Manually Entered (Unverified Draft)</option>
+            </Select>
           </div>
 
           <div className="flex justify-end gap-3 pt-3">

@@ -28,18 +28,37 @@ import {
   ArrowLeft,
   ShareNetwork,
   TrendUp,
+  Warning,
 } from "@phosphor-icons/react";
+import { RoomLoading } from "@/components/ui/RoomLoading";
 
 export default function EventDetailPage() {
   const params = useParams();
-  const eventId = params.eventId as string;
+  const eventId = (params?.eventId as string) || "";
 
-  const [event, setEvent] = useState<EventItem | null>(null);
-  const [eventGuests, setEventGuests] = useState<any[]>([]);
-  const [allCrmGuests, setAllCrmGuests] = useState<Guest[]>([]);
+  const [event, setEvent] = useState<EventItem | null>(() => {
+    if (eventId) {
+      return db.getEventById(eventId) || null;
+    }
+    return null;
+  });
+  const [eventGuests, setEventGuests] = useState<any[]>(() => {
+    if (eventId) return db.getEventGuests(eventId);
+    return [];
+  });
+  const [allCrmGuests, setAllCrmGuests] = useState<Guest[]>(() => {
+    if (eventId) {
+      const e = db.getEventById(eventId);
+      if (e) return db.getGuests(e.organisation_id);
+    }
+    return [];
+  });
+  const [loading, setLoading] = useState<boolean>(() => !event);
   const [isAddGuestOpen, setIsAddGuestOpen] = useState(false);
   const [isManualModalOpen, setIsManualModalOpen] = useState(false);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+  const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
+  const [cancelReason, setCancelReason] = useState("");
   const [selectedGuestId, setSelectedGuestId] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<GuestCategory>("Creator");
   const [actionNotice, setActionNotice] = useState<string | null>(null);
@@ -58,12 +77,43 @@ export default function EventDetailPage() {
       setEventGuests([...db.getEventGuests(eventId)]);
       setAllCrmGuests([...db.getGuests(e.organisation_id)]);
     }
+    setLoading(false);
   };
+
+  const handleStatusChange = (newStatus: any) => {
+    if (newStatus === "cancelled") {
+      setIsCancelModalOpen(true);
+      return;
+    }
+    db.updateEventStatus(eventId, newStatus);
+    refreshData();
+    showNotice(`Event status updated to ${newStatus.toUpperCase()}`);
+  };
+
+  const handleConfirmCancel = () => {
+    db.updateEventStatus(
+      eventId,
+      "cancelled",
+      undefined,
+      undefined,
+      cancelReason || "Cancelled by event producer"
+    );
+    setIsCancelModalOpen(false);
+    refreshData();
+    showNotice("Event cancelled. All issued passes have been invalidated.");
+  };
+
+  if (loading) {
+    return <RoomLoading fullPage size="lg" text="Loading Event Workspace..." />;
+  }
 
   if (!event) {
     return (
       <div className="max-w-7xl mx-auto px-6 py-20 text-center space-y-4">
         <h2 className="headline text-2xl text-ink">Event not found</h2>
+        <p className="text-sm text-ink/70 max-w-md mx-auto">
+          The event ID &ldquo;{eventId}&rdquo; could not be found in the current workspace. It may have been moved or deleted.
+        </p>
         <Link href="/events">
           <Button variant="secondary">Back to Events</Button>
         </Link>
@@ -210,6 +260,48 @@ export default function EventDetailPage() {
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
+            {/* Status Lifecycle Actions */}
+            {event.status === "draft" && (
+              <Button
+                variant="promo"
+                size="md"
+                onClick={() => handleStatusChange("published")}
+                className="gap-2 bg-semantic-success text-white hover:bg-semantic-success/90"
+              >
+                <CheckCircle className="w-4 h-4" />
+                <span>Publish Event</span>
+              </Button>
+            )}
+            {event.status === "published" && (
+              <Button
+                variant="secondary"
+                size="md"
+                onClick={() => handleStatusChange("ongoing")}
+                className="gap-2 text-xs"
+              >
+                <span>Mark Ongoing</span>
+              </Button>
+            )}
+            {event.status === "ongoing" && (
+              <Button
+                variant="secondary"
+                size="md"
+                onClick={() => handleStatusChange("completed")}
+                className="gap-2 text-xs"
+              >
+                <span>Complete Event</span>
+              </Button>
+            )}
+            {event.status !== "cancelled" && event.status !== "completed" && (
+              <button
+                type="button"
+                onClick={() => setIsCancelModalOpen(true)}
+                className="text-xs font-mono text-destructive hover:underline px-2 py-1.5"
+              >
+                Cancel Event
+              </button>
+            )}
+
             <Link href={`/events/${event.id}/check-in`}>
               <Button variant="primary" size="md" className="gap-2">
                 <QrCode className="w-4 h-4" />
@@ -627,6 +719,50 @@ export default function EventDetailPage() {
               </div>
             ))
           )}
+        </div>
+      </Modal>
+
+      {/* Event Cancellation Modal */}
+      <Modal
+        isOpen={isCancelModalOpen}
+        onClose={() => setIsCancelModalOpen(false)}
+        title="Cancel Activation Event"
+        description="Cancelling will immediately invalidate all active QR passes and disable gate check-in."
+      >
+        <div className="space-y-4">
+          <div className="p-3 bg-destructive/10 border border-destructive/20 rounded-md flex items-start gap-3 text-xs text-destructive">
+            <Warning className="w-5 h-5 shrink-0 mt-0.5" />
+            <p>
+              Warning: This is an irreversible operational state. All issued guest QR passes will be marked as revoked, and any subsequent gate scan attempts will be strictly rejected.
+            </p>
+          </div>
+
+          <div className="space-y-1">
+            <label className="text-xs font-mono uppercase text-ink/70">
+              Reason for Cancellation *
+            </label>
+            <textarea
+              rows={3}
+              required
+              placeholder="e.g. Venue scheduling conflict, weather emergency, client postponement..."
+              value={cancelReason}
+              onChange={(e) => setCancelReason(e.target.value)}
+              className="w-full px-4 py-2 bg-canvas border border-hairline rounded-md text-sm text-ink"
+            />
+          </div>
+
+          <div className="flex items-center justify-end gap-3 pt-3 border-t border-hairline">
+            <Button variant="secondary" onClick={() => setIsCancelModalOpen(false)}>
+              Keep Event Active
+            </Button>
+            <Button
+              variant="promo"
+              onClick={handleConfirmCancel}
+              className="bg-destructive text-white hover:bg-destructive/90"
+            >
+              Confirm Cancellation
+            </Button>
+          </div>
         </div>
       </Modal>
 

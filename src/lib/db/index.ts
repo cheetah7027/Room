@@ -112,7 +112,50 @@ class RoomDatabase {
   }
 
   public getEventById(eventId: string): EventItem | undefined {
-    return this.events.find((e) => e.id === eventId);
+    if (!eventId) return undefined;
+    const cleanId = eventId.trim();
+    return this.events.find(
+      (e) => e.id === cleanId || e.id.toLowerCase() === cleanId.toLowerCase()
+    );
+  }
+
+  public updateEventStatus(
+    eventId: string,
+    newStatus: EventStatus,
+    actorId = "usr-rahul-01",
+    actorName = "Rahul Mehta",
+    reason?: string
+  ): EventItem | undefined {
+    const idx = this.events.findIndex(
+      (e) => e.id === eventId || e.id.toLowerCase() === eventId?.toLowerCase()
+    );
+    if (idx === -1) return undefined;
+
+    const previousStatus = this.events[idx].status;
+    this.events[idx] = {
+      ...this.events[idx],
+      status: newStatus,
+      updated_at: new Date().toISOString(),
+    };
+
+    // If cancelled, invalidate all active QR passes for this event
+    if (newStatus === "cancelled") {
+      this.qrPasses.forEach((p) => {
+        if (p.event_id === eventId) {
+          p.is_revoked = true;
+        }
+      });
+    }
+
+    this.logAudit(
+      actorId,
+      actorName,
+      "EVENT_STATUS_CHANGED",
+      "events",
+      eventId,
+      { previousStatus, newStatus, reason: reason || `Status updated to ${newStatus}` }
+    );
+    return this.events[idx];
   }
 
   public createEvent(data: Omit<EventItem, "id" | "created_at" | "updated_at">): EventItem {
@@ -406,6 +449,26 @@ class RoomDatabase {
     }
 
     const { pass, eventGuest, guest, checkIn } = passContext;
+    const targetEvent = this.events.find(
+      (e) => e.id === eventId || e.id.toLowerCase() === eventId?.toLowerCase()
+    );
+    if (targetEvent?.status === "cancelled") {
+      return {
+        success: false,
+        status: "cancelled",
+        message: "This event has been cancelled. Entry is closed.",
+        guest,
+      };
+    }
+    if (targetEvent?.status === "completed") {
+      return {
+        success: false,
+        status: "invalid_pass",
+        message: "This event has already concluded and gate entry is closed.",
+        guest,
+      };
+    }
+
     if (pass.event_id !== eventId) {
       return {
         success: false,
@@ -534,7 +597,16 @@ class RoomDatabase {
 
     const actualAttendance = checkIns.length;
     const attendanceRate = acceptedCount > 0 ? Math.round((actualAttendance / acceptedCount) * 100) : 0;
-    const noShowRate = acceptedCount > 0 ? Math.max(0, Math.round(((acceptedCount - actualAttendance) / acceptedCount) * 100)) : 0;
+    const event = this.events.find(
+      (e) => e.id === eventId || e.id.toLowerCase() === eventId?.toLowerCase()
+    );
+    const isFinished =
+      event?.status === "completed" ||
+      (event?.end_time && new Date(event.end_time).getTime() < Date.now());
+    const noShowRate =
+      isFinished && acceptedCount > 0
+        ? Math.max(0, Math.round(((acceptedCount - actualAttendance) / acceptedCount) * 100))
+        : 0;
 
     // Category distribution
     const categoryCounts: Record<string, number> = {};

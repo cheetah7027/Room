@@ -25,7 +25,7 @@ import {
 export function TopNav() {
   const pathname = usePathname();
   const router = useRouter();
-  const { persona, setPersona, can } = useAuth();
+  const { persona, setPersona, can, isAuthenticated, logout } = useAuth();
   const [isSwitcherOpen, setIsSwitcherOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -47,48 +47,67 @@ export function TopNav() {
     <header className="sticky top-0 z-40 bg-canvas/95 backdrop-blur-md border-b border-hairline h-16 flex items-center px-4 md:px-8 justify-between">
       {/* Left: Brand + Dynamic Role Pill + Navigation */}
       <div className="flex items-center space-x-6 lg:space-x-8">
-        <Link href={homeRoute} className="flex items-center space-x-3 shrink-0">
+        <Link href={isAuthenticated ? homeRoute : "/"} className="flex items-center space-x-3 shrink-0">
           <RoomLogo className="h-12 w-auto" />
-          <span
-            className={`text-[10px] font-mono uppercase tracking-widest px-2.5 py-0.5 rounded-full font-semibold ${persona.badgeColor}`}
-          >
-            {persona.role.replace(/_/g, " ")}
-          </span>
+          {isAuthenticated && (
+            <span
+              className={`text-[10px] font-mono uppercase tracking-widest px-2.5 py-0.5 rounded-full font-semibold ${persona.badgeColor}`}
+            >
+              {persona.role.replace(/_/g, " ")}
+            </span>
+          )}
         </Link>
 
         {/* Dynamic Navigation Links based on RBAC.md Section 6 */}
-        <nav className="hidden md:flex items-center space-x-5 text-sm font-medium">
-          {navItems.map((item) => {
-            const isActive = pathname === item.href;
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`transition-colors relative flex items-center gap-1.5 py-1 ${
-                  isActive
-                    ? "text-primary font-semibold"
-                    : "text-ink/80 hover:text-primary"
-                }`}
-              >
-                <span>{item.label}</span>
-                {item.badge && (
-                  <span className="text-[9px] font-mono uppercase px-1.5 py-0.2 rounded bg-block-lime text-ink font-bold">
-                    {item.badge}
-                  </span>
-                )}
-                {isActive && (
-                  <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-full" />
-                )}
-              </Link>
-            );
-          })}
-        </nav>
+        {isAuthenticated && (
+          <nav className="hidden md:flex items-center space-x-5 text-sm font-medium">
+            {navItems.map((item) => {
+              const isActive = pathname === item.href;
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`transition-colors relative flex items-center gap-1.5 py-1 ${
+                    isActive
+                      ? "text-primary font-semibold"
+                      : "text-ink/80 hover:text-primary"
+                  }`}
+                >
+                  <span>{item.label}</span>
+                  {item.badge && (
+                    <span className="text-[9px] font-mono uppercase px-1.5 py-0.2 rounded bg-block-lime text-ink font-bold">
+                      {item.badge}
+                    </span>
+                  )}
+                  {isActive && (
+                    <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-full" />
+                  )}
+                </Link>
+              );
+            })}
+          </nav>
+        )}
       </div>
 
       {/* Right: Persona Switcher + Create Event Action */}
       <div className="flex items-center space-x-3">
-        {/* Persona / RBAC Role Switcher */}
-        <div className="relative" ref={dropdownRef}>
+        {!isAuthenticated ? (
+          <div className="flex items-center gap-2">
+            <Link href="/sign-in">
+              <Button variant="ghost" size="sm" className="text-xs">
+                Sign In
+              </Button>
+            </Link>
+            <Link href="/sign-up">
+              <Button variant="primary" size="sm" className="text-xs">
+                Create Organisation
+              </Button>
+            </Link>
+          </div>
+        ) : (
+          <>
+            {/* Persona / RBAC Role Switcher */}
+            <div className="relative" ref={dropdownRef}>
           <button
             onClick={() => setIsSwitcherOpen(!isSwitcherOpen)}
             className="flex items-center gap-2 px-2.5 py-1.5 rounded-md border border-hairline hover:bg-surface-soft transition-all text-left"
@@ -183,18 +202,34 @@ export function TopNav() {
                 <span>Least Privilege Enforced</span>
                 <span className="text-semantic-success font-semibold">● ACTIVE</span>
               </div>
+
+              <div className="p-2 border-t border-hairline bg-canvas rounded-b-md">
+                <button
+                  onClick={() => {
+                    logout();
+                    setIsSwitcherOpen(false);
+                    router.push("/sign-in");
+                  }}
+                  className="w-full text-left px-2.5 py-1.5 rounded text-xs font-mono text-destructive hover:bg-destructive/10 transition-colors flex items-center justify-between"
+                >
+                  <span>Sign Out of Workspace</span>
+                  <span className="text-[10px] uppercase font-bold text-destructive/70">Logout</span>
+                </button>
+              </div>
             </div>
           )}
         </div>
 
-        {/* Action: Create Event (Only if permitted: Owner, Admin, Event Manager) */}
-        {can("events.create") && (
-          <Link href="/events/new">
-            <Button variant="primary" size="sm" className="inline-flex items-center gap-1.5">
-              <Sparkle className="w-3.5 h-3.5" />
-              <span>Create Event</span>
-            </Button>
-          </Link>
+            {/* Action: Create Event (Only if permitted: Owner, Admin, Event Manager) */}
+            {can("events.create") && (
+              <Link href="/events/new">
+                <Button variant="primary" size="sm" className="inline-flex items-center gap-1.5">
+                  <Sparkle className="w-3.5 h-3.5" />
+                  <span>Create Event</span>
+                </Button>
+              </Link>
+            )}
+          </>
         )}
       </div>
     </header>

@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "tsx --test tests/domain.test.ts tests/lifecycle.test.ts tests/excel.test.ts"
+    "test": "tsx --test tests/domain.test.ts tests/lifecycle.test.ts tests/excel.test.ts tests/audit_remediations.test.ts"
   },
   "dependencies": {
     "@phosphor-icons/react": "^2.1.10",

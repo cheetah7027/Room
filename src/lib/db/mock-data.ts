@@ -254,7 +254,7 @@ export const initialEventGuests: EventGuest[] = [
     event_id: "evt-aura-2026",
     guest_id: "gst-ananya-01",
     category: "Creator",
-    status: "confirmed",
+    status: "checked_in",
     plus_ones_allowed: 1,
     plus_ones_registered: 1,
   },
@@ -475,6 +475,8 @@ export const initialCreators: Creator[] = [
     average_sentiment: "Very High",
     notes: "High aesthetic alignment with botanical luxury brands.",
     is_verified: true,
+    provenance: "Agency Verified",
+    last_synced_at: "2026-11-15T09:00:00.000Z",
     created_at: "2026-01-20T10:00:00.000Z",
   },
   {
@@ -497,6 +499,8 @@ export const initialCreators: Creator[] = [
     average_sentiment: "Very High",
     notes: "Top performer for cinematic video activations.",
     is_verified: true,
+    provenance: "API Sync",
+    last_synced_at: "2026-11-17T14:30:00.000Z",
     created_at: "2026-01-22T11:00:00.000Z",
   },
   {
@@ -518,6 +522,8 @@ export const initialCreators: Creator[] = [
     average_sentiment: "High",
     notes: "Editorial authority; great for press and PR seeding.",
     is_verified: true,
+    provenance: "Creator Provided",
+    last_synced_at: "2026-11-10T12:00:00.000Z",
     created_at: "2026-02-05T09:30:00.000Z",
   },
   {
@@ -540,6 +546,8 @@ export const initialCreators: Creator[] = [
     average_sentiment: "High",
     notes: "Deep technical breakdowns, strong male demographic.",
     is_verified: false,
+    provenance: "Manually Entered",
+    last_synced_at: "2026-11-01T10:00:00.000Z",
     created_at: "2026-02-12T14:00:00.000Z",
   },
   {
@@ -561,6 +569,8 @@ export const initialCreators: Creator[] = [
     average_sentiment: "Very High",
     notes: "Ideal ambassador for skincare launches.",
     is_verified: true,
+    provenance: "Agency Verified",
+    last_synced_at: "2026-11-16T18:00:00.000Z",
     created_at: "2026-02-18T16:30:00.000Z",
   },
 ];

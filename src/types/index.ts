@@ -193,6 +193,8 @@ export interface Creator {
   average_sentiment: "High" | "Neutral" | "Very High";
   notes?: string;
   is_verified: boolean;
+  provenance?: "Agency Verified" | "Creator Provided" | "Manually Entered" | "API Sync";
+  last_synced_at?: string;
   created_at: string;
 }
 
