@@ -21,14 +21,17 @@ import {
 
 export default function GuestPassPage() {
   const params = useParams();
-  const token = params.token as string;
+  const token = (params?.token as string) || "";
 
-  const [context, setContext] = useState<any>(null);
+  const [context, setContext] = useState<any>(() => {
+    if (token) return db.getPassByToken(token);
+    return null;
+  });
   const [qrDataUrl, setQrDataUrl] = useState<string>("");
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState<boolean>(() => !token);
 
   useEffect(() => {
-    const ctx = db.getPassByToken(token);
+    const ctx = token ? db.getPassByToken(token) : null;
     if (ctx) {
       setContext(ctx);
       // Generate scannable QR Code containing the token

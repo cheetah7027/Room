@@ -35,12 +35,16 @@ export default function DashboardPage() {
       {/* Editorial Welcome Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-4 border-b border-hairline">
         <div>
-          <div className="flex items-center gap-2 mb-2">
+          <div className="flex flex-wrap items-center gap-2 mb-2">
             <span className="caption-mono text-primary font-semibold">
               Agency Workspace • {org.name}
             </span>
             <span className="text-hairline">|</span>
             <span className="caption-mono text-ink/70">Plan: {org.plan}</span>
+            <span className="text-hairline">|</span>
+            <span className="text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-full bg-block-lime/60 text-ink font-bold">
+              Pilot Sandbox Mode
+            </span>
           </div>
           <h1 className="display-lg text-ink tracking-tight">
             Event operations &amp; <br />
@@ -143,16 +147,16 @@ export default function DashboardPage() {
         <Card className="flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between text-ink/60 mb-2">
-              <span className="caption-mono">Check-in Idempotency</span>
+              <span className="caption-mono">Gate Idempotency</span>
               <ShieldCheck className="w-4 h-4 text-primary" />
             </div>
-            <div className="text-4xl font-semibold tracking-tight text-ink font-sans">
-              100%
+            <div className="text-3xl font-semibold tracking-tight text-ink font-sans">
+              Active
             </div>
           </div>
           <div className="mt-4 pt-3 border-t border-hairline flex items-center justify-between text-xs text-ink/70">
-            <span>Zero duplicate entries</span>
-            <span className="font-mono text-[11px] text-primary">SERVER HASHED</span>
+            <span>Cryptographic pass hashing</span>
+            <span className="font-mono text-[11px] text-semantic-success font-medium">● Enforced</span>
           </div>
         </Card>
 
@@ -167,7 +171,7 @@ export default function DashboardPage() {
             </div>
           </div>
           <div className="mt-4 pt-3 border-t border-hairline flex items-center justify-between text-xs text-ink/70">
-            <span>Verified influencers</span>
+            <span>Profiles with provenance</span>
             <Link href="/creators" className="text-primary hover:underline font-medium">
               Explore →
             </Link>
@@ -180,7 +184,7 @@ export default function DashboardPage() {
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
           <div className="max-w-2xl">
             <span className="caption-mono text-ink font-bold">
-              Operational Workflow • P0 Execution
+              Operational Workflow • Automated RSVP &amp; Check-in
             </span>
             <h3 className="headline text-2xl font-semibold mt-2 mb-3">
               Automated invitation lifecycles &amp; instant gate entry.

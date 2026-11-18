@@ -55,6 +55,7 @@ describe("ROOM — Audit Remediations & Lifecycle Verification", () => {
       category: "VIP",
       tags: ["VIP"],
       relationship_owner: "Rahul Mehta",
+      social_links: {},
       communication_preferences: { email: true, whatsapp: true },
     });
 
@@ -124,5 +125,33 @@ describe("ROOM — Audit Remediations & Lifecycle Verification", () => {
     assert.ok(creator.id);
     assert.strictEqual(creator.provenance, "Agency Verified");
     assert.ok(creator.last_synced_at);
+  });
+
+  it("should record content submission metric provenance and capture timestamp", () => {
+    const sub = db.addContentSubmission({
+      event_id: "evt-aura-2026",
+      creator_id: "crt-ananya-01",
+      creator_name: "Ananya Rao",
+      post_url: "https://instagram.com/reel/C9_TestReel",
+      platform: "Instagram",
+      post_type: "Reel",
+      published_at: new Date().toISOString(),
+      campaign_hashtags: ["#AuraLaunch"],
+      metrics: { views: 50000, likes: 3000, comments: 120, shares: 450 },
+      metrics_source: "Agency Verified",
+      metrics_captured_at: new Date().toISOString(),
+      notes: "Verified against Meta Graph API",
+    });
+
+    assert.ok(sub.id);
+    assert.strictEqual(sub.metrics_source, "Agency Verified");
+    assert.ok(sub.metrics_captured_at);
+    assert.strictEqual(sub.metrics.views, 50000);
+  });
+
+  it("should update and persist organisation subscription plan entitlements", () => {
+    const updated = db.updateOrganisation(db.organisation.id, { plan: "Growth" });
+    assert.strictEqual(updated.plan, "Growth");
+    assert.strictEqual(db.organisation.plan, "Growth");
   });
 });

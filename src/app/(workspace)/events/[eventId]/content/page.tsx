@@ -59,6 +59,7 @@ export default function EventContentPage() {
     comments: 240,
     shares: 1100,
     notes: "Aesthetic placement at botanical perfume station.",
+    metrics_source: "Agency Verified" as const,
   });
 
   useEffect(() => {
@@ -95,6 +96,8 @@ export default function EventContentPage() {
         comments: Number(formData.comments),
         shares: Number(formData.shares),
       },
+      metrics_source: formData.metrics_source,
+      metrics_captured_at: new Date().toISOString(),
       notes: formData.notes,
     });
 
@@ -180,6 +183,22 @@ export default function EventContentPage() {
                     <span className="text-xs font-mono uppercase text-ink/60">
                       {item.post_type}
                     </span>
+                    {item.metrics_source && (
+                      <span
+                        className={`text-[9px] font-mono uppercase px-2 py-0.5 rounded-full font-bold inline-flex items-center gap-1 ${
+                          item.metrics_source === "Agency Verified"
+                            ? "bg-semantic-success/15 text-semantic-success border border-semantic-success/30"
+                            : item.metrics_source === "Platform Graph API"
+                            ? "bg-block-navy/15 text-primary border border-primary/25"
+                            : item.metrics_source === "Creator Submitted"
+                            ? "bg-block-lilac/50 text-ink border border-block-lilac"
+                            : "bg-surface-soft text-ink/70 border border-hairline"
+                        }`}
+                      >
+                        <span>●</span>
+                        <span>{item.metrics_source}</span>
+                      </span>
+                    )}
                   </div>
                   <h3 className="card-title text-xl font-bold text-ink font-sans">
                     {item.creator_name}
@@ -230,6 +249,14 @@ export default function EventContentPage() {
                   </div>
                   <div className="text-[10px] text-ink/60 uppercase">Shares</div>
                 </div>
+              </div>
+
+              {/* Provenance and Verification Timestamp */}
+              <div className="flex items-center justify-between text-[10px] font-mono text-ink/50 px-1">
+                <span>Source: {item.metrics_source || "Manual Entry"}</span>
+                {item.metrics_captured_at && (
+                  <span>Verified: {new Date(item.metrics_captured_at).toLocaleDateString("en-IN", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}</span>
+                )}
               </div>
 
               {item.notes && (
@@ -422,6 +449,28 @@ export default function EventContentPage() {
               }
               className="w-full px-4 py-2 bg-canvas border border-hairline rounded-md text-sm text-ink"
             />
+          </div>
+
+          <div className="space-y-1">
+            <label className="text-xs font-mono uppercase text-ink/70">
+              Metric Provenance &amp; Verification Method
+            </label>
+            <Select
+              value={formData.metrics_source}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  metrics_source: e.target.value as any,
+                })
+              }
+              containerClassName="w-full"
+              className="w-full text-sm"
+            >
+              <option value="Agency Verified">Agency Verified (Audit Checked by Producer)</option>
+              <option value="Platform Graph API">Platform Graph API (Instagram / YouTube OAuth)</option>
+              <option value="Creator Submitted">Creator Submitted (Screenshots / Media Kit)</option>
+              <option value="Manual Entry">Manual Entry (Estimated / Unverified)</option>
+            </Select>
           </div>
 
           <div className="flex justify-end gap-3 pt-3">

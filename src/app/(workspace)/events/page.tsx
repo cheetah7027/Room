@@ -84,7 +84,7 @@ export default function EventsPage() {
           <span className="text-xs font-mono uppercase text-ink/60 mr-1 hidden sm:inline">
             Status:
           </span>
-          {["all", "published", "draft", "completed"].map((st) => (
+          {["all", "published", "ongoing", "completed", "draft", "cancelled"].map((st) => (
             <button
               key={st}
               onClick={() => setStatusFilter(st)}

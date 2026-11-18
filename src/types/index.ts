@@ -214,6 +214,8 @@ export interface ContentSubmission {
     comments?: number;
     shares?: number;
   };
+  metrics_source?: "Agency Verified" | "Creator Submitted" | "Platform Graph API" | "Manual Entry";
+  metrics_captured_at?: string;
   evidence_url?: string;
   notes?: string;
   created_at: string;

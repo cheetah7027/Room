@@ -23,17 +23,34 @@ import {
 
 export default function GuestInvitePage() {
   const params = useParams();
-  const token = params.token as string;
+  const token = (params?.token as string) || "";
   const router = useRouter();
 
-  const [context, setContext] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const [context, setContext] = useState<any>(() => {
+    if (token) return db.getInvitationByToken(token);
+    return null;
+  });
+  const [loading, setLoading] = useState<boolean>(() => !token);
   const [submitting, setSubmitting] = useState(false);
-  const [responseSubmitted, setResponseSubmitted] = useState<string | null>(null);
-  const [generatedPass, setGeneratedPass] = useState<any>(null);
+  const [responseSubmitted, setResponseSubmitted] = useState<string | null>(() => {
+    if (token) {
+      const ctx = db.getInvitationByToken(token);
+      if (ctx && (ctx.invitation.status === "accepted" || ctx.invitation.status === "declined")) {
+        return ctx.invitation.status;
+      }
+    }
+    return null;
+  });
+  const [generatedPass, setGeneratedPass] = useState<any>(() => {
+    if (token) {
+      const ctx = db.getInvitationByToken(token);
+      return ctx?.qrPass || null;
+    }
+    return null;
+  });
 
   useEffect(() => {
-    const ctx = db.getInvitationByToken(token);
+    const ctx = token ? db.getInvitationByToken(token) : null;
     if (ctx) {
       setContext(ctx);
       if (ctx.invitation.status === "accepted" || ctx.invitation.status === "declined") {

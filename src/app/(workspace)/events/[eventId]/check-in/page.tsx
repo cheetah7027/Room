@@ -49,6 +49,7 @@ export default function CheckInConsolePage() {
     if (eventId) return [...db.checkIns.filter((c) => c.event_id === eventId)].reverse();
     return [];
   });
+  const [showSandboxShortcuts, setShowSandboxShortcuts] = useState(false);
   const [isCameraActive, setIsCameraActive] = useState(false);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const scanIntervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -400,20 +401,44 @@ export default function CheckInConsolePage() {
                 </Button>
               </div>
 
-              {/* Sample Quick Test Tokens for testing */}
-              <div className="flex flex-wrap items-center gap-2 pt-2">
-                <span className="text-[11px] font-mono text-ink/50">Quick Test Passes:</span>
-                {db.qrPasses
-                  .filter((p) => p.event_id === eventId)
-                  .map((p) => (
-                    <button
-                      key={p.id}
-                      onClick={() => handleVerifyPass(p.secure_token)}
-                      className="px-2.5 py-1 rounded-full text-[11px] font-mono bg-surface-soft hover:bg-block-lime border border-hairline text-ink transition-colors"
-                    >
-                      {p.secure_token.split("_").pop()}
-                    </button>
-                  ))}
+              {/* Developer Sandbox Controls (Hidden by Default in Live Production) */}
+              <div className="pt-2 border-t border-hairline">
+                <div className="flex items-center justify-between text-xs">
+                  <div className="flex items-center gap-1.5 text-ink/70">
+                    <span className="w-2 h-2 rounded-full bg-[#f79009]" />
+                    <span className="font-mono text-[11px] uppercase">Developer Sandbox Helpers</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setShowSandboxShortcuts(!showSandboxShortcuts)}
+                    className="text-[11px] font-mono text-primary hover:underline"
+                  >
+                    {showSandboxShortcuts ? "Hide Test Shortcuts" : "Show Test Shortcuts (Sandbox)"}
+                  </button>
+                </div>
+
+                {showSandboxShortcuts && (
+                  <div className="mt-2.5 p-3 rounded bg-[#fffcf5] border border-[#fec84b] space-y-2 animate-in fade-in">
+                    <div className="flex items-center justify-between text-[11px] text-[#b54708] font-mono">
+                      <span>SANDBOX SIMULATION SHORTCUTS (DISABLED IN PRODUCTION)</span>
+                      <span className="px-1.5 py-0.5 rounded bg-[#fec84b]/40 font-bold">NON-PROD</span>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      {db.qrPasses
+                        .filter((p) => p.event_id === eventId)
+                        .map((p) => (
+                          <button
+                            key={p.id}
+                            onClick={() => handleVerifyPass(p.secure_token)}
+                            className="px-2.5 py-1 rounded text-[11px] font-mono bg-white hover:bg-block-lime border border-[#fec84b] text-ink transition-colors flex items-center gap-1 shadow-xs"
+                          >
+                            <span className="text-ink/60">{p.secure_token.split("_").slice(-2, -1)[0]}:</span>
+                            <span className="font-bold">{p.secure_token.split("_").pop()}</span>
+                          </button>
+                        ))}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 
