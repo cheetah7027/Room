@@ -32,7 +32,7 @@ export default function WorkspaceLayout({
             <span>•</span>
             <span>Delhi NCR</span>
             <span>•</span>
-            <span className="text-primary font-semibold">B2B PILOT READY</span>
+            <span className="text-ink/70 font-semibold font-mono">PILOT EVALUATION BUILD</span>
           </div>
         </div>
       </footer>

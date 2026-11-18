@@ -296,7 +296,7 @@ export default function DashboardPage() {
 
           <Card className="p-5 space-y-4">
             <p className="text-xs text-ink/60 leading-relaxed">
-              Every invitation dispatch, role modification, guest check-in, and export is recorded in an immutable audit ledger.
+              Every invitation dispatch, role modification, guest check-in, and export is recorded in the verified system audit log.
             </p>
 
             <div className="space-y-3 pt-2">
@@ -325,7 +325,7 @@ export default function DashboardPage() {
               Live Event Day Contingency
             </span>
             <h4 className="headline text-lg font-semibold text-white">
-              Zero-Downtime Check-in
+              High-Availability Check-in
             </h4>
             <p className="text-xs text-white/80 leading-relaxed">
               If venue Wi-Fi falters, staff can utilize instant manual lookup by name, phone or VIP category with built-in idempotent conflict resolution.

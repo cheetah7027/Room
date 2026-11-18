@@ -325,13 +325,13 @@ export default function CheckInConsolePage() {
 
         <Card className="p-5 flex items-center justify-between">
           <div>
-            <span className="caption-mono text-ink/60">Idempotent Gate</span>
+            <span className="caption-mono text-ink/60">Gate Security</span>
             <div className="text-base font-semibold text-semantic-success mt-1 flex items-center gap-1.5">
               <ShieldCheck className="w-4 h-4" />
-              <span>Strict Duplicate Lock</span>
+              <span>Idempotent Pass Lock</span>
             </div>
           </div>
-          <Badge variant="outline">SERVER ENFORCED</Badge>
+          <Badge variant="outline">HMAC Token Auth</Badge>
         </Card>
       </div>
 

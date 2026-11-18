@@ -292,7 +292,7 @@ export default function GuestInvitePage() {
 
       {/* Footer */}
       <footer className="py-6 text-center text-xs text-ink/50 font-mono">
-        POWERED BY ROOM • ZERO-KNOWLEDGE BEARER TOKEN
+        POWERED BY ROOM • SECURE OPAQUE BEARER TOKEN
       </footer>
     </div>
   );

@@ -11,7 +11,7 @@ import { ShieldCheck, Lock, ArrowRight, SignIn } from "@phosphor-icons/react";
 
 export function RouteGuard({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const { persona, isAuthenticated } = useAuth();
+  const { persona, isAuthenticated, login } = useAuth();
 
   // If unauthenticated, prompt to sign in
   if (!isAuthenticated) {
@@ -37,15 +37,18 @@ export function RouteGuard({ children }: { children: React.ReactNode }) {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
             <Link href="/sign-in">
               <Button variant="primary" size="lg" className="gap-2">
-                <span>Sign In to Organisation</span>
+                <span>Sign In with Credentials</span>
                 <ArrowRight className="w-4 h-4" />
               </Button>
             </Link>
-            <Link href="/sign-up">
-              <Button variant="secondary" size="lg">
-                Create Organisation
-              </Button>
-            </Link>
+            <Button
+              variant="secondary"
+              size="lg"
+              onClick={() => login()}
+              className="gap-2 font-mono text-xs uppercase"
+            >
+              <span>Explore Demo Workspace</span>
+            </Button>
           </div>
         </Card>
       </div>

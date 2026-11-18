@@ -603,15 +603,25 @@ class RoomDatabase {
     const isFinished =
       event?.status === "completed" ||
       (event?.end_time && new Date(event.end_time).getTime() < Date.now());
+    const pendingAttendance = Math.max(0, acceptedCount - actualAttendance);
     const noShowRate =
       isFinished && acceptedCount > 0
-        ? Math.max(0, Math.round(((acceptedCount - actualAttendance) / acceptedCount) * 100))
+        ? Math.max(0, Math.round((pendingAttendance / acceptedCount) * 100))
         : 0;
 
-    // Category distribution
-    const categoryCounts: Record<string, number> = {};
+    // Category distribution: tracks invited, confirmed RSVPs, and checked-in counts
+    const categoryCounts: Record<string, { invited: number; confirmed: number; attended: number }> = {};
     egList.forEach((eg) => {
-      categoryCounts[eg.category] = (categoryCounts[eg.category] || 0) + 1;
+      if (!categoryCounts[eg.category]) {
+        categoryCounts[eg.category] = { invited: 0, confirmed: 0, attended: 0 };
+      }
+      categoryCounts[eg.category].invited += 1;
+      if (eg.status === "confirmed" || eg.status === "checked_in") {
+        categoryCounts[eg.category].confirmed += 1;
+      }
+      if (eg.status === "checked_in") {
+        categoryCounts[eg.category].attended += 1;
+      }
     });
 
     // Content reach
@@ -626,14 +636,20 @@ class RoomDatabase {
       deliveryRate,
       acceptedCount,
       declinedCount,
+      rsvpResponses,
       acceptanceRate,
       declineRate,
       actualAttendance,
       attendanceRate,
+      pendingAttendance,
+      isFinished,
       noShowRate,
-      categoryDistribution: Object.entries(categoryCounts).map(([category, count]) => ({
+      categoryDistribution: Object.entries(categoryCounts).map(([category, stats]) => ({
         category,
-        count,
+        count: stats.invited,
+        invitedCount: stats.invited,
+        confirmedCount: stats.confirmed,
+        attendedCount: stats.attended,
       })),
       creatorParticipation: egList.filter((eg) => eg.category === "Creator").length,
       contentCount: content.length,

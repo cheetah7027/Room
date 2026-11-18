@@ -188,7 +188,7 @@ export default function ReportsHubPage() {
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h3 className="card-title text-xl font-bold text-ink">
-            Immutable Audit Trail
+            System Audit Log &amp; Governance Trail
           </h3>
           <span className="caption-mono text-xs text-ink/60">
             Total Records: {auditLogs.length}

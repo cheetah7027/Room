@@ -60,6 +60,7 @@ export default function EventContentPage() {
     shares: 1100,
     notes: "Aesthetic placement at botanical perfume station.",
     metrics_source: "Agency Verified" as const,
+    evidence_url: "",
   });
 
   useEffect(() => {
@@ -98,6 +99,7 @@ export default function EventContentPage() {
       },
       metrics_source: formData.metrics_source,
       metrics_captured_at: new Date().toISOString(),
+      evidence_url: formData.evidence_url || undefined,
       notes: formData.notes,
     });
 
@@ -258,6 +260,19 @@ export default function EventContentPage() {
                   <span>Verified: {new Date(item.metrics_captured_at).toLocaleDateString("en-IN", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}</span>
                 )}
               </div>
+
+              {item.evidence_url && (
+                <div className="text-[10px] font-mono px-1">
+                  <a
+                    href={item.evidence_url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-primary hover:underline inline-flex items-center gap-1 font-semibold"
+                  >
+                    <span>● Verified Proof / Evidence Screenshot</span>
+                  </a>
+                </div>
+              )}
 
               {item.notes && (
                 <p className="text-xs text-ink/70 italic border-l-2 border-primary/40 pl-3">
@@ -471,6 +486,21 @@ export default function EventContentPage() {
               <option value="Creator Submitted">Creator Submitted (Screenshots / Media Kit)</option>
               <option value="Manual Entry">Manual Entry (Estimated / Unverified)</option>
             </Select>
+          </div>
+
+          <div className="space-y-1">
+            <label className="text-xs font-mono uppercase text-ink/70">
+              Evidence Screenshot URL (Optional Verification Proof)
+            </label>
+            <input
+              type="url"
+              placeholder="https://images.unsplash.com/... or cloud storage URL"
+              value={formData.evidence_url}
+              onChange={(e) =>
+                setFormData({ ...formData, evidence_url: e.target.value })
+              }
+              className="w-full px-4 py-2 bg-canvas border border-hairline rounded-md text-sm text-ink"
+            />
           </div>
 
           <div className="flex justify-end gap-3 pt-3">

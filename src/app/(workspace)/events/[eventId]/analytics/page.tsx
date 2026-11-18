@@ -179,9 +179,14 @@ export default function EventAnalyticsPage() {
           <div className="text-4xl font-extrabold text-ink font-sans">
             {analytics.acceptanceRate}%
           </div>
-          <div className="text-xs text-ink/60 mt-3 pt-3 border-t border-hairline flex justify-between">
-            <span>Accepted: {analytics.acceptedCount}</span>
-            <span className="text-[#b42318]">Declined: {analytics.declinedCount}</span>
+          <div className="text-xs text-ink/60 mt-3 pt-3 border-t border-hairline flex flex-col gap-1">
+            <div className="flex justify-between">
+              <span>Accepted: {analytics.acceptedCount}</span>
+              <span className="text-[#b42318]">Declined: {analytics.declinedCount}</span>
+            </div>
+            <div className="text-[10px] text-ink/50 font-mono">
+              {analytics.acceptedCount} of {analytics.rsvpResponses || (analytics.acceptedCount + analytics.declinedCount)} responded • {Math.round((analytics.acceptedCount / analytics.totalInvited) * 100)}% of {analytics.totalInvited} invited
+            </div>
           </div>
         </Card>
 
@@ -194,20 +199,31 @@ export default function EventAnalyticsPage() {
           </div>
           <div className="text-xs text-ink/60 mt-3 pt-3 border-t border-hairline flex justify-between">
             <span>Capacity: {event.capacity}</span>
-            <span className="font-mono text-semantic-success font-semibold">Verified</span>
+            <span className="font-mono text-semantic-success font-semibold">
+              {analytics.actualAttendance > 0 ? "Gate Verified" : "Scheduled (Pre-event)"}
+            </span>
           </div>
         </Card>
 
         <Card className="p-6">
           <div className="text-xs font-mono uppercase text-ink/60 mb-2">
-            No-Show Rate
+            {analytics.isFinished ? "No-Show Rate" : "Attendance Status"}
           </div>
           <div className="text-4xl font-extrabold text-ink font-sans">
-            {analytics.noShowRate}%
+            {analytics.isFinished ? `${analytics.noShowRate}%` : `${analytics.actualAttendance}/${analytics.acceptedCount}`}
           </div>
           <div className="text-xs text-ink/60 mt-3 pt-3 border-t border-hairline flex justify-between">
-            <span>Unattended RSVPs: {Math.max(0, analytics.acceptedCount - analytics.actualAttendance)}</span>
-            <span className="text-xs text-ink/50">Industry avg: 22%</span>
+            {analytics.isFinished ? (
+              <>
+                <span>Unattended: {analytics.pendingAttendance} of {analytics.acceptedCount}</span>
+                <span className="text-xs text-ink/50 font-mono">Finalized</span>
+              </>
+            ) : (
+              <>
+                <span>Pending Entry: {analytics.pendingAttendance}</span>
+                <span className="text-[11px] text-primary font-mono font-medium">Pending Gate</span>
+              </>
+            )}
           </div>
         </Card>
       </div>
@@ -219,10 +235,10 @@ export default function EventAnalyticsPage() {
             Audience Composition &amp; Access Categories
           </span>
           <h3 className="headline text-2xl font-bold mt-1">
-            Guest Category Distribution
+            Guest Category Distribution — All Invitees &amp; Confirmed RSVPs
           </h3>
           <p className="text-sm text-ink/80 mt-1 max-w-2xl">
-            Breakdown of confirmed attendees across creator, media, and VIP tiers.
+            Breakdown across creator, media, and VIP tiers for {analytics.totalInvited} total invitees ({analytics.acceptedCount} confirmed RSVPs).
           </p>
         </div>
 
@@ -238,12 +254,17 @@ export default function EventAnalyticsPage() {
               <div className="text-2xl font-bold text-ink mt-2">
                 {item.count}
               </div>
-              <span className="text-[11px] text-ink/50 mt-1">
-                {analytics.totalInvited > 0
-                  ? Math.round((item.count / analytics.totalInvited) * 100)
-                  : 0}
-                % of total
-              </span>
+              <div className="text-[11px] text-ink/60 mt-1 flex flex-col gap-0.5">
+                <span className="font-semibold text-primary">
+                  {item.confirmedCount ?? item.count} confirmed
+                </span>
+                <span>
+                  {analytics.totalInvited > 0
+                    ? Math.round((item.count / analytics.totalInvited) * 100)
+                    : 0}
+                  % of {analytics.totalInvited} invited
+                </span>
+              </div>
             </div>
           ))}
         </div>

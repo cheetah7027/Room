@@ -254,7 +254,7 @@ export const initialEventGuests: EventGuest[] = [
     event_id: "evt-aura-2026",
     guest_id: "gst-ananya-01",
     category: "Creator",
-    status: "checked_in",
+    status: "confirmed",
     plus_ones_allowed: 1,
     plus_ones_registered: 1,
   },
@@ -440,19 +440,7 @@ export const initialQRPasses: QRPass[] = [
   },
 ];
 
-export const initialCheckIns: CheckIn[] = [
-  {
-    id: "chk-aura-01",
-    event_id: "evt-aura-2026",
-    event_guest_id: "eg-aura-01",
-    pass_id: "pass-aura-01",
-    operator_id: "usr-karan-03",
-    operator_name: "Karan Verma",
-    method: "qr_scan",
-    checked_in_at: "2026-11-28T18:45:12.000Z",
-    idempotency_key: "idem_aura_chk_ananya_01",
-  },
-];
+export const initialCheckIns: CheckIn[] = [];
 
 export const initialCreators: Creator[] = [
   {
@@ -577,15 +565,15 @@ export const initialCreators: Creator[] = [
 
 export const initialContentSubmissions: ContentSubmission[] = [
   {
-    id: "cnt-aura-01",
-    event_id: "evt-aura-2026",
+    id: "cnt-founders-01",
+    event_id: "evt-founders-dinner",
     creator_id: "crt-ananya-01",
     creator_name: "Ananya Rao",
-    post_url: "https://www.instagram.com/reel/C8_AuraBotanicalsSS26",
+    post_url: "https://www.instagram.com/reel/C8_FoundersSalonOlive",
     platform: "Instagram",
     post_type: "Reel",
-    published_at: "2026-11-28T21:30:00.000Z",
-    campaign_hashtags: ["#AuraSanctuary", "#BotanicalGlow", "#RoomExperiences"],
+    published_at: "2026-11-03T14:30:00.000Z",
+    campaign_hashtags: ["#FoundersSalon", "#ExperientialCommerce", "#RoomNetwork"],
     metrics: {
       views: 142000,
       likes: 12400,
@@ -593,21 +581,21 @@ export const initialContentSubmissions: ContentSubmission[] = [
       shares: 1950,
     },
     metrics_source: "Agency Verified",
-    metrics_captured_at: "2026-11-28T22:30:00.000Z",
+    metrics_captured_at: "2026-11-04T10:30:00.000Z",
     evidence_url: "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=800&q=80",
-    notes: "High aesthetic styling featuring the sanctuary perfume bar.",
-    created_at: "2026-11-28T22:00:00.000Z",
+    notes: "Curated dinner discussion highlight reel at Olive Beach Bengaluru.",
+    created_at: "2026-11-03T15:00:00.000Z",
   },
   {
-    id: "cnt-aura-02",
-    event_id: "evt-aura-2026",
+    id: "cnt-founders-02",
+    event_id: "evt-founders-dinner",
     creator_id: "crt-kabir-02",
     creator_name: "Kabir Sen",
-    post_url: "https://www.instagram.com/reel/C8_KabirAuraCinematic",
+    post_url: "https://www.instagram.com/reel/C8_KabirCreatorsMixer",
     platform: "Instagram",
     post_type: "Reel",
-    published_at: "2026-11-28T22:15:00.000Z",
-    campaign_hashtags: ["#AuraSanctuary", "#ShotByKabir", "#ExperientialIndia"],
+    published_at: "2026-11-03T16:15:00.000Z",
+    campaign_hashtags: ["#FoundersSalon", "#ShotByKabir", "#BrandExperiences"],
     metrics: {
       views: 285000,
       likes: 31200,
@@ -615,10 +603,10 @@ export const initialContentSubmissions: ContentSubmission[] = [
       shares: 4100,
     },
     metrics_source: "Platform Graph API",
-    metrics_captured_at: "2026-11-28T22:50:00.000Z",
+    metrics_captured_at: "2026-11-04T11:50:00.000Z",
     evidence_url: "https://images.unsplash.com/photo-1511578314322-379afb476865?w=800&q=80",
-    notes: "Cinematic 4K grading of the Leela Palace greenhouse setup.",
-    created_at: "2026-11-28T22:45:00.000Z",
+    notes: "Cinematic 4K recap of experiential dinner roundtable.",
+    created_at: "2026-11-03T17:00:00.000Z",
   },
 ];
 
@@ -648,12 +636,12 @@ export const initialAuditLogs: AuditLog[] = [
   {
     id: "aud-003",
     organisation_id: "org-pulse-01",
-    actor_id: "usr-karan-03",
-    actor_name: "Karan Verma",
-    action: "GUEST_CHECKED_IN",
-    resource_type: "check_ins",
-    resource_id: "chk-aura-01",
-    metadata: { guest_name: "Ananya Rao", method: "qr_scan" },
-    created_at: "2026-11-28T18:45:12.000Z",
+    actor_id: "usr-rahul-01",
+    actor_name: "Rahul Mehta",
+    action: "ACCESS_TIERS_CONFIGURED",
+    resource_type: "events",
+    resource_id: "evt-aura-2026",
+    metadata: { tiers: ["Creator", "VVIP", "VIP", "Media"] },
+    created_at: "2026-11-12T10:15:00.000Z",
   },
 ];

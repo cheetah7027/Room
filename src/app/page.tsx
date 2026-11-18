@@ -136,7 +136,7 @@ export default function HomePage() {
                 <div className="space-y-1">
                   <h3 className="font-bold text-base text-ink">Branded RSVP &amp; Bearer Tokens</h3>
                   <p className="text-xs text-ink/70 leading-relaxed">
-                    Zero-knowledge invitation links allow guests to accept or decline without passwords. Accepted responses instantly generate cryptographic QR passes.
+                    Cryptographic invitation links allow guests to accept or decline securely without passwords. Accepted responses instantly generate scannable QR passes.
                   </p>
                 </div>
               </Card>

@@ -185,12 +185,12 @@ export default function CreatorCrmPage() {
               Targeted Creator Matching for D2C &amp; Luxury Activations
             </h3>
             <p className="text-sm text-ink/80 leading-relaxed">
-              Find creators who match your target audience, not just vanity follower counts. ROOM tracks past attendance reliability, content velocity, and average audience sentiment.
+              Find creators who match your target aesthetic and brand audience. ROOM tracks past activation attendance, collaboration history, and audience reach with verifiable provenance.
             </p>
           </div>
           <div className="flex items-center gap-2">
             <span className="font-mono text-xs uppercase text-ink/70">
-              Verified Profiles: {creators.length}
+              Talent Profiles: {creators.length}
             </span>
           </div>
         </div>
@@ -327,9 +327,16 @@ export default function CreatorCrmPage() {
             </div>
 
             <div className="pt-3 border-t border-hairline flex items-center justify-between">
-              <span className="text-[11px] font-mono text-ink/50 uppercase">
-                Languages: {creator.languages.join(", ")}
-              </span>
+              <div className="flex flex-col gap-0.5">
+                <span className="text-[11px] font-mono text-ink/50 uppercase">
+                  Languages: {creator.languages.join(", ")}
+                </span>
+                {creator.last_synced_at && (
+                  <span className="text-[10px] font-mono text-ink/40">
+                    Freshness: {new Date(creator.last_synced_at).toLocaleDateString("en-IN", { month: "short", day: "numeric", year: "numeric" })}
+                  </span>
+                )}
+              </div>
 
               {can("invitations.send") && (
                 <Button

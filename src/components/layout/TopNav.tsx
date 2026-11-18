@@ -229,6 +229,18 @@ export function TopNav() {
                 </Button>
               </Link>
             )}
+
+            {/* Direct Top-Level Sign Out Button */}
+            <button
+              onClick={() => {
+                logout();
+                router.push("/sign-in");
+              }}
+              title="Sign Out of Workspace Session"
+              className="text-xs font-mono uppercase text-ink/60 hover:text-destructive px-2.5 py-1.5 rounded border border-hairline hover:border-destructive/30 hover:bg-destructive/10 transition-colors hidden sm:inline-flex items-center gap-1"
+            >
+              <span>Sign Out</span>
+            </button>
           </>
         )}
       </div>

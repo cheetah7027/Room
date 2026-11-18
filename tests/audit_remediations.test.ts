@@ -154,4 +154,35 @@ describe("ROOM — Audit Remediations & Lifecycle Verification", () => {
     assert.strictEqual(updated.plan, "Growth");
     assert.strictEqual(db.organisation.plan, "Growth");
   });
+
+  it("should ensure future scheduled events start with zero attendance and pending gate entry", () => {
+    const eventId = "evt-aura-2026";
+    const analytics = db.getEventAnalytics(eventId);
+
+    // Prior to event gates opening, actual attendance is 0
+    assert.strictEqual(analytics.actualAttendance, 0);
+    assert.strictEqual(analytics.isFinished, false);
+    // Unattended RSVPs should be marked as pending gate entry, not no-show
+    assert.strictEqual(analytics.pendingAttendance, analytics.acceptedCount);
+    assert.strictEqual(analytics.noShowRate, 0);
+  });
+
+  it("should reconcile category distribution with both total invited and confirmed RSVPs", () => {
+    const eventId = "evt-aura-2026";
+    const analytics = db.getEventAnalytics(eventId);
+
+    // Sum of invited across all categories must match totalInvited
+    const sumInvited = analytics.categoryDistribution.reduce(
+      (acc: number, curr: any) => acc + (curr.invitedCount || curr.count),
+      0
+    );
+    assert.strictEqual(sumInvited, analytics.totalInvited);
+
+    // Sum of confirmed across categories must match acceptedCount
+    const sumConfirmed = analytics.categoryDistribution.reduce(
+      (acc: number, curr: any) => acc + (curr.confirmedCount || 0),
+      0
+    );
+    assert.strictEqual(sumConfirmed, analytics.acceptedCount);
+  });
 });
