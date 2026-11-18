@@ -1,0 +1,204 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: "Funnel Display";
+  src: url("/fonts/FunnelDisplay-VariableFont_wght.ttf") format("truetype");
+  font-weight: 300 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Forum";
+  src: url("/fonts/Forum-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --primary: #990b47;
+  --on-primary: #ffffff;
+  --ink: #2b3364;
+  --canvas: #ffffff;
+  --inverse-canvas: #2b3364;
+  --hairline: #e8e1df;
+  --surface-soft: #f7eee9;
+  --block-lime: #fff49d;
+  --block-lilac: #adbaff;
+  --block-cream: #f7eee9;
+  --block-navy: #2b3364;
+  --semantic-success: #287a57;
+
+  --font-funnel-display: "Funnel Display", -apple-system, sans-serif;
+  --font-forum: "Forum", Georgia, serif;
+  --font-fredoka: "Fredoka", sans-serif;
+  --font-mono: var(--font-fredoka), "Fredoka", sans-serif;
+}
+
+body {
+  color: var(--ink);
+  background-color: var(--canvas);
+  font-family: var(--font-forum), "Forum", Georgia, serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Large text & Headings use Funnel Display */
+h1, h2, h3, h4, h5, h6,
+.display-xl,
+.display-lg,
+.headline,
+.card-title,
+.font-display,
+.font-funnel,
+.text-2xl,
+.text-3xl,
+.text-4xl,
+.text-5xl,
+.text-6xl {
+  font-family: var(--font-funnel-display), "Funnel Display", -apple-system, sans-serif;
+}
+
+/* Headings inherit large font down to their inline elements unless overridden */
+h1 *, h2 *, h3 *, h4 *, h5 *, h6 *,
+.display-xl *, .display-lg *, .headline *, .card-title *, .font-display *, .font-funnel * {
+  font-family: inherit;
+}
+
+/* Small text, Body copy, Descriptions use Forum font */
+body,
+p,
+blockquote,
+dd,
+dt,
+figcaption,
+.font-body,
+.font-forum {
+  font-family: var(--font-forum), "Forum", Georgia, serif;
+}
+
+/* UI Controls, Form Inputs, Select Dropdowns, Buttons, Tabs use Funnel Display / Sans */
+button,
+input,
+select,
+textarea,
+label,
+.btn-primary,
+.btn-secondary,
+.btn-icon,
+.font-sans,
+.font-display,
+.font-funnel {
+  font-family: var(--font-funnel-display), "Funnel Display", -apple-system, sans-serif;
+}
+
+/* Code, Eyebrows, Technical Tokens, Monospace use Fredoka */
+.font-mono,
+.caption-mono,
+.eyebrow,
+code,
+pre,
+kbd,
+samp {
+  font-family: var(--font-fredoka, "Fredoka"), sans-serif !important;
+}
+
+.font-mono *,
+.caption-mono *,
+.eyebrow * {
+  font-family: inherit !important;
+}
+
+/* Linear Infinite Marquee Animation */
+@keyframes marquee {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+.animate-marquee {
+  animation: marquee 35s linear infinite;
+  will-change: transform;
+}
+
+/* Custom Design System Classes */
+.btn-primary {
+  @apply inline-flex items-center justify-center rounded-pill bg-primary text-white font-medium px-5 py-2.5 hover:bg-primary-pressed transition-all duration-150 active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none;
+}
+
+.btn-secondary {
+  @apply inline-flex items-center justify-center rounded-pill bg-canvas text-ink border border-hairline font-medium px-5 py-2 hover:bg-surface-soft transition-all duration-150 active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none;
+}
+
+.btn-icon {
+  @apply inline-flex items-center justify-center w-10 h-10 rounded-full bg-surface-soft text-ink hover:bg-hairline transition-all duration-150 active:scale-95 disabled:opacity-50 disabled:pointer-events-none;
+}
+
+.btn-icon-inverse {
+  @apply inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/20 text-white hover:bg-white/30 transition-all duration-150 active:scale-95;
+}
+
+.color-block-gold {
+  @apply bg-block-lime text-ink rounded-lg p-8 md:p-12 transition-all;
+}
+
+.color-block-lilac {
+  @apply bg-block-lilac text-ink rounded-lg p-8 md:p-12 transition-all;
+}
+
+.color-block-seashell {
+  @apply bg-block-cream text-ink rounded-lg p-8 md:p-12 transition-all;
+}
+
+.color-block-navy {
+  @apply bg-block-navy text-white rounded-lg p-8 md:p-12 transition-all;
+}
+
+/* Typography styles matching DESIGN-2-recolored */
+.display-xl {
+  font-size: clamp(2.5rem, 6vw, 5.375rem);
+  line-height: 1.0;
+  letter-spacing: -1.72px;
+  font-weight: 400;
+}
+
+.display-lg {
+  font-size: clamp(2rem, 4.5vw, 4rem);
+  line-height: 1.1;
+  letter-spacing: -0.96px;
+  font-weight: 400;
+}
+
+.headline {
+  font-size: 1.625rem;
+  line-height: 1.35;
+  letter-spacing: -0.26px;
+  font-weight: 600;
+}
+
+.card-title {
+  font-size: 1.5rem;
+  line-height: 1.45;
+  font-weight: 700;
+}
+
+.eyebrow {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.875rem;
+  font-weight: 500;
+  letter-spacing: 0.54px;
+  text-transform: uppercase;
+}
+
+.caption-mono {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.75rem;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+}
